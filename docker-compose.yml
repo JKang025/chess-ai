@@ -1,0 +1,6 @@
+version: '1'
+services:
+  primary:
+    image: test:latest
+    volumes:
+      - ${PWD}:/src
