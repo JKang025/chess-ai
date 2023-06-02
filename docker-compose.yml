@@ -1,6 +1,6 @@
 version: '1'
 services:
   primary:
-    image: test:latest
+    image: chess:latest
     volumes:
       - ${PWD}:/src
