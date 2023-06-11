@@ -30,7 +30,7 @@ class Board{
         void generateMoves();
         void executeMove();
 
-        U64 getBit(U64 bitboard, int square);
+        U64 getBit(U64 bitboard, boardSquare square);
         void setBit(U64& bitboard, boardSquare square);
         void removeBit(U64& bitboard, boardSquare square);
     
@@ -44,6 +44,7 @@ class Board{
             }
         };
 
+       
         int charToPiece(char c);
         char pieceToChar(int i);
 

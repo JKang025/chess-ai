@@ -3,6 +3,8 @@
 
 class Piece{
     public:
+        enum color{white, black};
+
         const int none = 0;
         const int pawn = 1;
         const int knight = 2;
@@ -16,7 +18,7 @@ class Piece{
 
         bool isSlidingPiece(int piece);
         bool isRightColor(int piece, bool isWhite);
-        
+
 
 
 };

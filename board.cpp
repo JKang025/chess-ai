@@ -84,7 +84,7 @@ void Board::printBitboard(U64 bitboard){
                 cout << 8 - rank << " ";
             }
             int square = rank * 8 + file;
-            cout << (getBit(bitboard, square) ? 1 : 0) << " "; 
+            cout << (getBit(bitboard, static_cast<Board::boardSquare>(square)) ? 1 : 0) << " "; 
         }
         cout << "\n";
     }
@@ -93,7 +93,10 @@ void Board::printBitboard(U64 bitboard){
 
 }
 
-U64 Board::getBit(U64 bitboard, int square){
+// BIT MANIPULATION
+// =========================
+// =========================
+U64 Board::getBit(U64 bitboard, Board::boardSquare square){
     return (bitboard & (1ULL << square));
 }
 
@@ -105,7 +108,18 @@ void Board::removeBit(U64& bitboard, Board::boardSquare square){
     getBit(bitboard, square) ? bitboard ^= (1ULL << square): 0;
 }
 
-//non bitboard displayboard. Most likely useless
+
+
+// ATTACKS
+// =========================
+// =========================
+
+
+
+
+
+
+//non bitboard stuff. Most likely useless
 /*
 void Board::displayBoard(){
 
@@ -125,7 +139,7 @@ void Board::displayBoard(){
     std::cout << "  a b c d e f g h" << std::endl;
     
 }
-*/
+
 
 int Board::charToPiece(char c){
     unordered_map<char, int> charToPieces;
@@ -163,3 +177,4 @@ char Board::pieceToChar(int i){
     return pieceToChar[i];
 
 }
+*/

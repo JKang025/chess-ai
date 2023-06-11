@@ -16,6 +16,9 @@ int main(int argc, char const *argv[]){
     Board b = Board();
     U64 bitboard = 0ULL;
     cout << (1ULL << 8) << endl;
+    b.setBit(bitboard, Board::e4);
+    cout << b.getBit(bitboard, Board::e4) << endl;
+    cout << b.getBit(bitboard, Board::e5) << endl;
 
     /*
     for(int i = 8; i >= 1; i--){
