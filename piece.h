@@ -3,7 +3,6 @@
 
 class Piece{
     public:
-        enum color{white, black};
 
         const int none = 0;
         const int pawn = 1;

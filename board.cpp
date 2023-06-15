@@ -10,10 +10,34 @@ const string STARTING_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq 
 const int BOARD_WIDTH = 8;
 const int BOARD_HEIGHT = 8;
 
+/*
+Bitboard represetation: 000...0001 represents a8, 000...0010 represents b8,
+000...100000000 represents a7, etc
+*/
+
+/* 
+NOT A FILE REPRESENTS:
+0 1 1 1 1 1 1 1 
+0 1 1 1 1 1 1 1 
+0 1 1 1 1 1 1 1 
+0 1 1 1 1 1 1 1 
+0 1 1 1 1 1 1 1 
+0 1 1 1 1 1 1 1 
+0 1 1 1 1 1 1 1 
+0 1 1 1 1 1 1 1 
+*/
+const U64 NOT_A_FILE = 18374403900871474942ULL;
+const U64 NOT_H_FILE = 9187201950435737471ULL;
+const U64 NOT_HG_FILE = 4557430888798830399ULL;
+const U64 NOT_AB_FILE = 18229723555195321596ULL;
+
 Board::Board() : Board(STARTING_FEN){
 }
 
 Board::Board(string fen){
+    /* WILL IMPLEMENT LATER!!!!!
+    ===========================
+
 
     theBoard = vector<int>(64, _piece.none);
 
@@ -72,7 +96,8 @@ Board::Board(string fen){
 
     // Sets up correct move and half-move 
     move = stoi(fullmovePart);
-    halfMove = stoi(halfmovePart);   
+    halfMove = stoi(halfmovePart);  
+    */ 
 }
 
 void Board::printBitboard(U64 bitboard){
@@ -108,73 +133,115 @@ void Board::removeBit(U64& bitboard, Board::boardSquare square){
     getBit(bitboard, square) ? bitboard ^= (1ULL << square): 0;
 }
 
-
-
 // ATTACKS
 // =========================
 // =========================
 
+U64 Board::generatePawnAttacks(Board::boardSquare square, Board::color side){
 
+    U64 attacks = 0ULL; // bitboard of possible attacks by pawn occupied in square
+    U64 bitboard = 0ULL; 
+    setBit(bitboard, square); // sets pawn to given location
 
-
-
-
-//non bitboard stuff. Most likely useless
-/*
-void Board::displayBoard(){
-
-    std::cout << "  a b c d e f g h" << std::endl;
-    std::cout << " -----------------" << std::endl;
-
-    for (int rank = BOARD_HEIGHT - 1; rank >= 0; rank--) {
-        std::cout << rank + 1 << "|";
-        for (int file = 0; file < BOARD_HEIGHT; file++) {
-            int p = theBoard[rank * 8 + file];
-            std::cout << pieceToChar(p) << "|";
+    // white
+    if(!side){
+        if((bitboard >> 7) & NOT_A_FILE){
+            attacks |= bitboard >> 7;
         }
-        std::cout << " " << rank + 1 << std::endl;
+        if((bitboard >> 9) & NOT_H_FILE){
+            attacks |= bitboard >> 9;
+        }
+    }
+    // black
+    else{  
+        if((bitboard << 7) & NOT_H_FILE){
+            attacks |= bitboard << 7;
+        }
+        if((bitboard << 9) & NOT_A_FILE){
+            attacks |= bitboard << 9;
+        }
+
+    }
+    return attacks;
+}
+
+U64 Board::generateKnightAttacks(Board::boardSquare square){
+    U64 attacks = 0ULL; // bitboard of possible attacks by knight occupied in square
+    U64 bitboard = 0ULL; 
+    setBit(bitboard, square); // sets knight to given location
+
+    // 17, 15, 10, 6 are the offsets for a knight's L-shaped move
+    if((bitboard >> 17) & NOT_H_FILE){
+        attacks |= bitboard >> 17;
+    }
+    if((bitboard >> 15) & NOT_A_FILE){
+        attacks |= bitboard >> 15;
+    }
+    if((bitboard >> 10) & NOT_HG_FILE){
+        attacks |= bitboard >> 10;
+    }
+    if((bitboard >> 6) & NOT_AB_FILE){
+        attacks |= bitboard >> 6;
     }
 
-    std::cout << " -----------------" << std::endl;
-    std::cout << "  a b c d e f g h" << std::endl;
+    // in the opposite direction
+    if((bitboard << 17) & NOT_A_FILE){
+        attacks |= bitboard << 17;
+    }
+    if((bitboard << 15) & NOT_H_FILE){
+        attacks |= bitboard << 15;
+    }
+    if((bitboard << 10) & NOT_AB_FILE){
+        attacks |= bitboard << 10;
+    }
+    if((bitboard << 6) & NOT_HG_FILE){
+        attacks |= bitboard << 6;
+    }
+    return attacks;
+}
+
+U64 Board::generateKingAttacks(Board::boardSquare square){
+    U64 attacks = 0ULL;
+    U64 bitboard = 0ULL;
+    setBit(bitboard, square);
+
+    if(bitboard >> 8){
+        attacks |= bitboard >> 8; 
+    }
+    if((bitboard >> 9) & NOT_H_FILE){
+        attacks |= bitboard >> 9;
+    }
+    if((bitboard >> 7) & NOT_A_FILE){
+        attacks |= bitboard >>7;
+    }
+    if((bitboard >> 1) & NOT_H_FILE){
+        attacks |= bitboard >> 1;
+    }
+
+    if(bitboard << 8){
+        attacks |= bitboard << 8; 
+    }
+    if((bitboard << 9) & NOT_A_FILE){
+        attacks |= bitboard << 9;
+    }
+    if((bitboard << 7) & NOT_H_FILE){
+        attacks |= bitboard << 7;
+    }
+    if((bitboard << 1) & NOT_A_FILE){
+        attacks |= bitboard << 1;
+    }
+
+    return attacks;
     
 }
 
+void Board::initializeLeaperPieces(){
+    for(int i = 0; i < 64; i++){
+        pawnAttacks[Board::white][i] = Board::generatePawnAttacks(static_cast<Board::boardSquare>(i), Board::white);
+        pawnAttacks[Board::black][i] = Board::generatePawnAttacks(static_cast<Board::boardSquare>(i), Board::black);
 
-int Board::charToPiece(char c){
-    unordered_map<char, int> charToPieces;
-    charToPieces['n'] = _piece.black | _piece.knight;
-    charToPieces['k'] = _piece.black | _piece.king;
-    charToPieces['b'] = _piece.black | _piece.bishop;
-    charToPieces['p'] = _piece.black | _piece.pawn;
-    charToPieces['q'] = _piece.black | _piece.queen;
-    charToPieces['r'] = _piece.black | _piece.rook;
-    charToPieces['N'] = _piece.white | _piece.knight;
-    charToPieces['K'] = _piece.white | _piece.king;
-    charToPieces['B'] = _piece.white | _piece.bishop;
-    charToPieces['P'] = _piece.white | _piece.pawn;
-    charToPieces['Q'] = _piece.white | _piece.queen;
-    charToPieces['R'] = _piece.white | _piece.rook;
-    charToPieces[' '] = _piece.none;
-    return charToPieces[c];
+        knightAttacks[i] = Board::generateKnightAttacks(static_cast<Board::boardSquare>(i));
+
+        kingAttacks[i] = Board::generateKingAttacks(static_cast<Board::boardSquare>(i));
+    }
 }
-
-char Board::pieceToChar(int i){
-    unordered_map<int, char> pieceToChar;
-    pieceToChar[_piece.black | _piece.knight] = 'n';
-    pieceToChar[_piece.black | _piece.king] = 'k';
-    pieceToChar[_piece.black | _piece.bishop] = 'b';
-    pieceToChar[_piece.black | _piece.pawn] = 'p';
-    pieceToChar[_piece.black | _piece.queen] = 'q';
-    pieceToChar[_piece.black | _piece.rook] = 'r';
-    pieceToChar[_piece.white | _piece.knight] = 'N';
-    pieceToChar[_piece.white | _piece.king] = 'K';
-    pieceToChar[_piece.white | _piece.bishop] = 'B';
-    pieceToChar[_piece.white | _piece.pawn] = 'P';
-    pieceToChar[_piece.white | _piece.queen] = 'Q';
-    pieceToChar[_piece.white | _piece.rook] = 'R';
-    pieceToChar[_piece.none] = ' ';
-    return pieceToChar[i];
-
-}
-*/

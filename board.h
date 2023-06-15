@@ -24,15 +24,32 @@ class Board{
         a1, b1, c1, d1, e1, f1, g1, h1,
         };
 
+        enum color{
+            white, black
+        };
+
         Board(string fen); 
         Board();
-        void printBitboard(U64 bitboard);
-        void generateMoves();
-        void executeMove();
+        //void generateMoves();
+        //void executeMove();
 
+        void printBitboard(U64 bitboard);
         U64 getBit(U64 bitboard, boardSquare square);
         void setBit(U64& bitboard, boardSquare square);
         void removeBit(U64& bitboard, boardSquare square);
+
+        U64 generatePawnAttacks(boardSquare square, color side);
+        U64 pawnAttacks[2][64];
+
+        U64 generateKnightAttacks(boardSquare sqaure);
+        U64 knightAttacks[64];
+
+        U64 generateKingAttacks(boardSquare square);
+        U64 kingAttacks[64];
+
+        void initializeLeaperPieces();
+        
+        
     
     private:
         struct Move{
@@ -44,15 +61,14 @@ class Board{
             }
         };
 
-       
-        int charToPiece(char c);
-        char pieceToChar(int i);
+         
 
-        
 
-        vector<int> theBoard;
-        vector<Move> legalMoves;
-        Piece _piece;
+
+
+       // PROLLY not used
+       // --------------------------
+
         
         bool whiteTurn;
         bool whiteCastleKing;

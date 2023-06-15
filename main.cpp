@@ -12,17 +12,21 @@
 "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", 
 */
 int main(int argc, char const *argv[]){
-    std::cout << "sdfsd" << std::endl;
+    /*
     Board b = Board();
     U64 bitboard = 0ULL;
     cout << (1ULL << 8) << endl;
     b.setBit(bitboard, Board::e4);
     cout << b.getBit(bitboard, Board::e4) << endl;
     cout << b.getBit(bitboard, Board::e5) << endl;
-
-    /*
-    for(int i = 8; i >= 1; i--){
-        printf("\"a%d\", \"b%d\", \"c%d\", \"d%d\", \"e%d\", \"f%d\", \"g%d\", \"h%d\", \n", i, i, i, i, i, i, i, i);
-    }
+    b.printBitboard(bitboard);
     */
+   Board bruh = Board();
+   //bruh.printBitboard(bruh.maskPawnAttacks(Board::a4, Board::black));
+   bruh.initializeLeaperPieces();
+   for(int i = 0; i < 64; i++){
+    bruh.printBitboard(bruh.kingAttacks[i]);
+   }
+   
+    
 };
