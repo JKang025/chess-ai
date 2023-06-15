@@ -137,6 +137,7 @@ void Board::removeBit(U64& bitboard, Board::boardSquare square){
 // =========================
 // =========================
 
+// generates possible attacks by pawn given its position square and side
 U64 Board::generatePawnAttacks(Board::boardSquare square, Board::color side){
 
     U64 attacks = 0ULL; // bitboard of possible attacks by pawn occupied in square
@@ -165,6 +166,7 @@ U64 Board::generatePawnAttacks(Board::boardSquare square, Board::color side){
     return attacks;
 }
 
+// generates possible attacks by knight given its position square
 U64 Board::generateKnightAttacks(Board::boardSquare square){
     U64 attacks = 0ULL; // bitboard of possible attacks by knight occupied in square
     U64 bitboard = 0ULL; 
@@ -200,6 +202,7 @@ U64 Board::generateKnightAttacks(Board::boardSquare square){
     return attacks;
 }
 
+// generates possible attacks by king given its position square
 U64 Board::generateKingAttacks(Board::boardSquare square){
     U64 attacks = 0ULL;
     U64 bitboard = 0ULL;
@@ -235,6 +238,7 @@ U64 Board::generateKingAttacks(Board::boardSquare square){
     
 }
 
+// initializes arrays that contain possible attack moves given a square for LEAPING pieces
 void Board::initializeLeaperPieces(){
     for(int i = 0; i < 64; i++){
         pawnAttacks[Board::white][i] = Board::generatePawnAttacks(static_cast<Board::boardSquare>(i), Board::white);
@@ -244,4 +248,126 @@ void Board::initializeLeaperPieces(){
 
         kingAttacks[i] = Board::generateKingAttacks(static_cast<Board::boardSquare>(i));
     }
+}
+
+// generates relevant occupancy spots for bishops for magic bitboard
+U64 Board::generateBishopAttacks(Board::boardSquare square){
+    U64 attacks = 0ULL;
+
+    int rank, file;
+    int targetRank =  square / 8;
+    int targetFile = square % 8;
+
+    // mask relevant occupancy spots for bishop
+    for(rank = targetRank + 1, file = targetFile + 1; rank < 7 && file < 7; rank++, file++){
+        attacks |=  (1ULL << (rank * 8 + file));
+    }
+    for(rank = targetRank - 1, file = targetFile + 1; rank > 0 && file < 7; rank--, file++){
+        attacks |=  (1ULL << (rank * 8 + file));
+    }
+    for(rank = targetRank + 1, file = targetFile - 1; rank < 7 && file > 0; rank++, file--){
+        attacks |=  (1ULL << (rank * 8 + file));
+    }
+    for(rank = targetRank - 1, file = targetFile - 1; rank > 0 && file > 0; rank--, file--){
+        attacks |=  (1ULL << (rank * 8 + file));
+    }
+    return attacks;
+}
+
+// generates relevant occupancy spots for rooks for magic bitboard
+U64 Board::generateRookAttacks(Board::boardSquare square){
+    U64 attacks = 0ULL;
+
+    int rank, file;
+    int targetRank =  square / 8;
+    int targetFile = square % 8;
+
+    // mask relevant occupancy spots for rook
+    for(rank = targetRank + 1; rank < 7; rank++){
+        attacks |= (1ULL << (rank * 8 + targetFile));
+    }
+    for(rank = targetRank - 1; rank > 0; rank--){
+        attacks |= (1ULL << (rank * 8 + targetFile));
+    }
+    for(file = targetFile + 1; file < 7; file++){
+        attacks |= (1ULL << (targetRank * 8 + file)); 
+    }
+    for(file = targetFile - 1; file > 0; file--){
+        attacks |= (1ULL << (targetRank * 8 + file)); 
+    }
+    
+    return attacks;
+}
+
+// generates bishop atacking moves given block
+U64 Board::generateRealBishopAttacks(Board::boardSquare square, U64 block){
+    U64 attacks = 0ULL;
+
+    int rank, file;
+    int targetRank =  square / 8;
+    int targetFile = square % 8;
+
+    // bishop attacks
+    for(rank = targetRank + 1, file = targetFile + 1; rank < 8 && file < 8; rank++, file++){
+        attacks |=  (1ULL << (rank * 8 + file));
+        if((1ULL << (rank * 8 + file)) & block){
+            break;
+        }
+    }
+    for(rank = targetRank - 1, file = targetFile + 1; rank >= 0 && file < 8; rank--, file++){
+        attacks |=  (1ULL << (rank * 8 + file));
+        if((1ULL << (rank * 8 + file)) & block){
+            break;
+        }
+    }
+    for(rank = targetRank + 1, file = targetFile - 1; rank < 8 && file >= 0; rank++, file--){
+        attacks |=  (1ULL << (rank * 8 + file));
+        if((1ULL << (rank * 8 + file)) & block){
+            break;
+        }
+    }
+    for(rank = targetRank - 1, file = targetFile - 1; rank >= 0 && file >= 0; rank--, file--){
+        attacks |=  (1ULL << (rank * 8 + file));
+        if((1ULL << (rank * 8 + file)) & block){
+            break;
+        }
+    }
+    return attacks;
+}
+
+// generates rook atacking moves given block
+U64 Board::generateRealRookAttacks(Board::boardSquare square, U64 block){
+    U64 attacks = 0ULL;
+
+    int rank, file;
+    int targetRank =  square / 8;
+    int targetFile = square % 8;
+
+    // mask relevant occupancy spots for rook
+    for(rank = targetRank + 1; rank < 8; rank++){
+        attacks |= (1ULL << (rank * 8 + targetFile));
+        if(1ULL << (rank * 8 + targetFile) & block){
+            break;
+        }
+    }
+    for(rank = targetRank - 1; rank >= 0; rank--){
+        attacks |= (1ULL << (rank * 8 + targetFile));
+        if(1ULL << (rank * 8 + targetFile) & block){
+            break;
+        }
+    }
+    for(file = targetFile + 1; file < 8; file++){
+        attacks |= (1ULL << (targetRank * 8 + file)); 
+        if(1ULL << (targetRank * 8 + file) & block){
+            break;
+        }
+    }
+    for(file = targetFile - 1; file >= 0; file--){
+        attacks |= (1ULL << (targetRank * 8 + file)); 
+        if(1ULL << (targetRank * 8 + file) & block){
+            break;
+        }
+    }
+    
+    return attacks;
 }

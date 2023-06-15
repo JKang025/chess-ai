@@ -23,10 +23,18 @@ int main(int argc, char const *argv[]){
     */
    Board bruh = Board();
    //bruh.printBitboard(bruh.maskPawnAttacks(Board::a4, Board::black));
-   bruh.initializeLeaperPieces();
-   for(int i = 0; i < 64; i++){
-    bruh.printBitboard(bruh.kingAttacks[i]);
-   }
-   
+   //bruh.initializeLeaperPieces();
+   //for(int i = 0; i < 64; i++){
+    //bruh.printBitboard(bruh.generateRookAttacks(static_cast<Board::boardSquare>(i)));
+  // }
+  //bruh.printBitboard(bruh.generateRealBishopAttacks(Board::d4, 0ULL));
+   //bruh.printBitboard(bruh.generateBishopAttacks(Board::e4));
+   U64 block = 0ULL;
+    bruh.setBit(block, Board::d3);
+    bruh.setBit(block, Board::d7);
+    bruh.setBit(block, Board::g4);
+    //bruh.setBit(block, Board::e2);
+    bruh.printBitboard(bruh.generateRealRookAttacks(Board::d4, block));
+
     
 };

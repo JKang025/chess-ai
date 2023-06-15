@@ -48,6 +48,14 @@ class Board{
         U64 kingAttacks[64];
 
         void initializeLeaperPieces();
+
+        U64 generateBishopAttacks(boardSquare square);
+        //U64 bishopAttacks[64];
+        U64 generateRealBishopAttacks(boardSquare square, U64 block);
+
+        U64 generateRookAttacks(boardSquare sqaure);
+        //64 rookAttacks[64];
+        U64 generateRealRookAttacks(boardSquare square, U64 block);
         
         
     
