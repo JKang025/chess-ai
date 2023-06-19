@@ -4,11 +4,12 @@
 #include <string>
 #include "board.h"
 
-using namespace std; 
 
 const string STARTING_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 const int BOARD_WIDTH = 8;
 const int BOARD_HEIGHT = 8;
+
+
 
 /*
 Bitboard represetation: 000...0001 represents a8, 000...0010 represents b8,
@@ -16,7 +17,7 @@ Bitboard represetation: 000...0001 represents a8, 000...0010 represents b8,
 */
 
 /* 
-NOT A FILE REPRESENTS:
+NOT_A_FILE REPRESENTS:
 0 1 1 1 1 1 1 1 
 0 1 1 1 1 1 1 1 
 0 1 1 1 1 1 1 1 
@@ -30,6 +31,31 @@ const U64 NOT_A_FILE = 18374403900871474942ULL;
 const U64 NOT_H_FILE = 9187201950435737471ULL;
 const U64 NOT_HG_FILE = 4557430888798830399ULL;
 const U64 NOT_AB_FILE = 18229723555195321596ULL;
+
+// relevant occupancy bit count for every square 
+// for example a bishop on a8 would have 6 occupancy bits
+const int BISHOP_RELEVANT_BITS[64] = {
+    6, 5, 5, 5, 5, 5, 5, 6,
+    5, 5, 5, 5, 5, 5, 5, 5,
+    5, 5, 7, 7, 7, 7, 5, 5,
+    5, 5, 7, 9, 9, 7, 5, 5,
+    5, 5, 7, 9, 9, 7, 5, 5,
+    5, 5, 7, 7, 7, 7, 5, 5,
+    5, 5, 5, 5, 5, 5, 5, 5,
+    6, 5, 5, 5, 5, 5, 5, 6
+};
+
+const int ROOK_RELEVANT_BITS[64] = {
+    12, 11, 11, 11, 11, 11, 11, 12,
+    11, 10, 10, 10, 10, 10, 10, 11,
+    11, 10, 10, 10, 10, 10, 10, 11,
+    11, 10, 10, 10, 10, 10, 10, 11,
+    11, 10, 10, 10, 10, 10, 10, 11,
+    11, 10, 10, 10, 10, 10, 10, 11,
+    11, 10, 10, 10, 10, 10, 10, 11,
+    12, 11, 11, 11, 11, 11, 11, 12
+};
+
 
 Board::Board() : Board(STARTING_FEN){
 }
@@ -109,7 +135,7 @@ void Board::printBitboard(U64 bitboard){
                 cout << 8 - rank << " ";
             }
             int square = rank * 8 + file;
-            cout << (getBit(bitboard, static_cast<Board::boardSquare>(square)) ? 1 : 0) << " "; 
+            cout << (getBit(bitboard, static_cast<boardSquare>(square)) ? 1 : 0) << " "; 
         }
         cout << "\n";
     }
@@ -121,16 +147,49 @@ void Board::printBitboard(U64 bitboard){
 // BIT MANIPULATION
 // =========================
 // =========================
-U64 Board::getBit(U64 bitboard, Board::boardSquare square){
+U64 Board::getBit(U64 bitboard, boardSquare square){
     return (bitboard & (1ULL << square));
 }
 
-void Board::setBit(U64& bitboard, Board::boardSquare square){
+void Board::setBit(U64& bitboard, boardSquare square){
     bitboard |= (1ULL << square);
 }
 
-void Board::removeBit(U64& bitboard, Board::boardSquare square){
+void Board::removeBit(U64& bitboard,boardSquare square){
     getBit(bitboard, square) ? bitboard ^= (1ULL << square): 0;
+}
+
+// counts number of bits in given ULL
+int Board::countBits(U64 bitboard){
+    int count = 0;
+    while(bitboard){
+        count++;
+        bitboard &= bitboard - 1;
+    }
+    return count;
+}
+
+// counts number of bits before least significant bit in given ULL
+int Board::firstLeastSignificantBitIndex(U64 bitboard){
+    // ensure that paramater is NOT 0
+    if(bitboard){
+        return countBits((bitboard & -bitboard) - 1);
+    }else{
+        return -1; 
+    }
+}
+// generates a specific occupancy bitboard from given num based on this 
+// specific attackMask
+U64 Board::setOccupancy(int num, int bitsInMask, U64 attackMask){
+     U64 occupancy = 0ULL;
+     for(int i = 0; i < bitsInMask; i++){
+        int square = Board::firstLeastSignificantBitIndex(attackMask);
+        Board::removeBit(attackMask, static_cast<boardSquare>(square));
+        if(num & (1 << i)){
+            occupancy |= (1ULL << square);
+        }
+     } 
+     return occupancy;
 }
 
 // ATTACKS
@@ -138,7 +197,7 @@ void Board::removeBit(U64& bitboard, Board::boardSquare square){
 // =========================
 
 // generates possible attacks by pawn given its position square and side
-U64 Board::generatePawnAttacks(Board::boardSquare square, Board::color side){
+U64 Board::generatePawnAttacks(boardSquare square, color side){
 
     U64 attacks = 0ULL; // bitboard of possible attacks by pawn occupied in square
     U64 bitboard = 0ULL; 
@@ -167,7 +226,7 @@ U64 Board::generatePawnAttacks(Board::boardSquare square, Board::color side){
 }
 
 // generates possible attacks by knight given its position square
-U64 Board::generateKnightAttacks(Board::boardSquare square){
+U64 Board::generateKnightAttacks(boardSquare square){
     U64 attacks = 0ULL; // bitboard of possible attacks by knight occupied in square
     U64 bitboard = 0ULL; 
     setBit(bitboard, square); // sets knight to given location
@@ -203,7 +262,7 @@ U64 Board::generateKnightAttacks(Board::boardSquare square){
 }
 
 // generates possible attacks by king given its position square
-U64 Board::generateKingAttacks(Board::boardSquare square){
+U64 Board::generateKingAttacks(boardSquare square){
     U64 attacks = 0ULL;
     U64 bitboard = 0ULL;
     setBit(bitboard, square);
@@ -241,17 +300,17 @@ U64 Board::generateKingAttacks(Board::boardSquare square){
 // initializes arrays that contain possible attack moves given a square for LEAPING pieces
 void Board::initializeLeaperPieces(){
     for(int i = 0; i < 64; i++){
-        pawnAttacks[Board::white][i] = Board::generatePawnAttacks(static_cast<Board::boardSquare>(i), Board::white);
-        pawnAttacks[Board::black][i] = Board::generatePawnAttacks(static_cast<Board::boardSquare>(i), Board::black);
+        pawnAttacks[white][i] = Board::generatePawnAttacks(static_cast<boardSquare>(i), white);
+        pawnAttacks[black][i] = Board::generatePawnAttacks(static_cast<boardSquare>(i), black);
 
-        knightAttacks[i] = Board::generateKnightAttacks(static_cast<Board::boardSquare>(i));
+        knightAttacks[i] = Board::generateKnightAttacks(static_cast<boardSquare>(i));
 
-        kingAttacks[i] = Board::generateKingAttacks(static_cast<Board::boardSquare>(i));
+        kingAttacks[i] = Board::generateKingAttacks(static_cast<boardSquare>(i));
     }
 }
 
 // generates relevant occupancy spots for bishops for magic bitboard
-U64 Board::generateBishopAttacks(Board::boardSquare square){
+U64 Board::generateBishopAttacks(boardSquare square){
     U64 attacks = 0ULL;
 
     int rank, file;
@@ -275,7 +334,7 @@ U64 Board::generateBishopAttacks(Board::boardSquare square){
 }
 
 // generates relevant occupancy spots for rooks for magic bitboard
-U64 Board::generateRookAttacks(Board::boardSquare square){
+U64 Board::generateRookAttacks(boardSquare square){
     U64 attacks = 0ULL;
 
     int rank, file;
@@ -300,7 +359,7 @@ U64 Board::generateRookAttacks(Board::boardSquare square){
 }
 
 // generates bishop atacking moves given block
-U64 Board::generateRealBishopAttacks(Board::boardSquare square, U64 block){
+U64 Board::generateRealBishopAttacks(boardSquare square, U64 block){
     U64 attacks = 0ULL;
 
     int rank, file;
@@ -336,7 +395,7 @@ U64 Board::generateRealBishopAttacks(Board::boardSquare square, U64 block){
 }
 
 // generates rook atacking moves given block
-U64 Board::generateRealRookAttacks(Board::boardSquare square, U64 block){
+U64 Board::generateRealRookAttacks(boardSquare square, U64 block){
     U64 attacks = 0ULL;
 
     int rank, file;
