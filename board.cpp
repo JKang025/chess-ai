@@ -3,13 +3,10 @@
 #include <iostream>
 #include <string>
 #include "board.h"
+#include "utils.h"
 
 
 const string STARTING_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-const int BOARD_WIDTH = 8;
-const int BOARD_HEIGHT = 8;
-
-
 
 /*
 Bitboard represetation: 000...0001 represents a8, 000...0010 represents b8,
@@ -27,6 +24,19 @@ NOT_A_FILE REPRESENTS:
 0 1 1 1 1 1 1 1 
 0 1 1 1 1 1 1 1 
 */
+
+const char* squareToCoordinates[64] = {
+    "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8", 
+    "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7", 
+    "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6", 
+    "a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5", 
+    "a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4", 
+    "a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3", 
+    "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2", 
+    "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1" 
+    };
+
+
 const U64 NOT_A_FILE = 18374403900871474942ULL;
 const U64 NOT_H_FILE = 9187201950435737471ULL;
 const U64 NOT_HG_FILE = 4557430888798830399ULL;
@@ -126,71 +136,7 @@ Board::Board(string fen){
     */ 
 }
 
-void Board::printBitboard(U64 bitboard){
-    cout << endl;
-    for(int rank = 0; rank < BOARD_HEIGHT; rank++){
-        for(int file = 0; file < BOARD_WIDTH; file++){
 
-            if(file == 0){
-                cout << 8 - rank << " ";
-            }
-            int square = rank * 8 + file;
-            cout << (getBit(bitboard, static_cast<boardSquare>(square)) ? 1 : 0) << " "; 
-        }
-        cout << "\n";
-    }
-    cout << "  a b c d e f g h\n \n";
-    cout << bitboard << "\n";
-
-}
-
-// BIT MANIPULATION
-// =========================
-// =========================
-U64 Board::getBit(U64 bitboard, boardSquare square){
-    return (bitboard & (1ULL << square));
-}
-
-void Board::setBit(U64& bitboard, boardSquare square){
-    bitboard |= (1ULL << square);
-}
-
-void Board::removeBit(U64& bitboard,boardSquare square){
-    getBit(bitboard, square) ? bitboard ^= (1ULL << square): 0;
-}
-
-// counts number of bits in given ULL
-int Board::countBits(U64 bitboard){
-    int count = 0;
-    while(bitboard){
-        count++;
-        bitboard &= bitboard - 1;
-    }
-    return count;
-}
-
-// counts number of bits before least significant bit in given ULL
-int Board::firstLeastSignificantBitIndex(U64 bitboard){
-    // ensure that paramater is NOT 0
-    if(bitboard){
-        return countBits((bitboard & -bitboard) - 1);
-    }else{
-        return -1; 
-    }
-}
-// generates a specific occupancy bitboard from given num based on this 
-// specific attackMask
-U64 Board::setOccupancy(int num, int bitsInMask, U64 attackMask){
-     U64 occupancy = 0ULL;
-     for(int i = 0; i < bitsInMask; i++){
-        int square = Board::firstLeastSignificantBitIndex(attackMask);
-        Board::removeBit(attackMask, static_cast<boardSquare>(square));
-        if(num & (1 << i)){
-            occupancy |= (1ULL << square);
-        }
-     } 
-     return occupancy;
-}
 
 // ATTACKS
 // =========================

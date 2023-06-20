@@ -4,9 +4,11 @@
 #include<string>
 #include "piece.h"
 #include "libconstants.h"
+#include "utils.h"
 
 using namespace std;
 using namespace libConst;
+using namespace Utils;
 
 
 
@@ -18,14 +20,6 @@ class Board{
         Board();
         //void generateMoves();
         //void executeMove();
-
-        void printBitboard(U64 bitboard);
-        U64 getBit(U64 bitboard, boardSquare square);
-        void setBit(U64& bitboard, boardSquare square);
-        void removeBit(U64& bitboard, boardSquare square);
-        int countBits(U64 bitboard);
-        int firstLeastSignificantBitIndex(U64 bitboard);
-        U64 setOccupancy(int num, int bitsInMask, U64 attackMask);
 
         U64 generatePawnAttacks(boardSquare square, color side);
         U64 pawnAttacks[2][64];
@@ -57,11 +51,6 @@ class Board{
                 endSqaure = end; 
             }
         };
-
-         
-
-
-
 
        // PROLLY not used
        // --------------------------
