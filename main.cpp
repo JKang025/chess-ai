@@ -13,10 +13,6 @@ int main(int argc, char const *argv[]){
    Random rand = Random();
    
     bruh.initializeLeaperPieces();
-    printBitboard((U64)rand.getRandomU32Num());
-    printBitboard((U64)rand.getRandomU32Num() & 0xFFFF); //remove first 16 bits
-    printBitboard(rand.getRandomU64Nums());
-    printBitboard(rand.generatemagicNumCand());
 
     
     

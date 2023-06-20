@@ -16,11 +16,7 @@ namespace myUtils{
     int firstLeastSignificantBitIndex(U64 bitboard);
     U64 setOccupancy(int num, int bitsInMask, U64 attackMask);
     
-    U64 findMagicNumber(boardSquare square, int relevantBits, int bishop){
-        U64 occupancies[4096];
-
-        U64 attacks[4096];
-    }
+    
 }
 
 

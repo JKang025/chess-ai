@@ -40,7 +40,9 @@ class Board{
         //64 rookAttacks[64];
         U64 generateRealRookAttacks(boardSquare square, U64 block);
         
-        
+
+        U64 findMagicNumber(boardSquare square, int relevantBits, int bishop);
+        void initializeMagicNumber();
     
     private:
         struct Move{

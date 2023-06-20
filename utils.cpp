@@ -67,3 +67,12 @@ U64 myUtils::setOccupancy(int num, int bitsInMask, U64 attackMask){
      return occupancy;
 }
 
+
+// MAGIC NUMBER STUFF
+// =========================
+// =========================
+
+
+// if bishop is 1, then it is for bishop. Otherwise, rooks
+
+
