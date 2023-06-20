@@ -15,7 +15,7 @@ main.o: board.h piece.h random.h libconstants.h utils.h main.cpp
 piece.o: piece.h piece.cpp 
 	$(CXX) $(CXXFLAGS) -o $@ -c piece.cpp
 
-random.o: random.h libconstants.h random.cpp 
+random.o: random.h libconstants.h utils.h random.cpp 
 	$(CXX) $(CXXFLAGS) -o $@ -c random.cpp
 
 utils.o: utils.h libconstants.h utils.cpp 

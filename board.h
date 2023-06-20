@@ -7,8 +7,8 @@
 #include "utils.h"
 
 using namespace std;
-using namespace libConst;
-using namespace Utils;
+using namespace myConstants;
+using namespace myUtils;
 
 
 

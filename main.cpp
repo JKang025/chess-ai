@@ -3,14 +3,9 @@
 #include "random.h"
 #include "utils.h"
 
-using namespace libConst;
-using namespace Utils;
+using namespace myConstants;
+using namespace myUtils;
 using namespace std;
-
-
-
-
-
 
 int main(int argc, char const *argv[]){
   

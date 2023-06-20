@@ -1,12 +1,12 @@
 #ifndef MYLIB_CONSTANTS_H
 #define MYLIB_CONSTANTS_H
 
-//  File Name : LibConstants.hpp    Purpose : Global Constants for Lib Utils
-namespace libConst
+namespace myConstants
 {
     typedef unsigned long long U64; 
     const int BOARD_WIDTH = 8;
     const int BOARD_HEIGHT = 8;
+    
     enum boardSquare{
         a8, b8, c8, d8, e8, f8, g8, h8,
         a7, b7, c7, d7, e7, f7, g7, h7,

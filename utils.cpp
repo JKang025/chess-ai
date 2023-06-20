@@ -1,6 +1,6 @@
 #include "utils.h"
 
-void Utils::printBitboard(U64 bitboard){
+void myUtils::printBitboard(U64 bitboard){
     cout << endl;
     for(int rank = 0; rank < BOARD_HEIGHT; rank++){
         for(int file = 0; file < BOARD_WIDTH; file++){
@@ -21,20 +21,21 @@ void Utils::printBitboard(U64 bitboard){
 // BIT MANIPULATION
 // =========================
 // =========================
-U64 Utils::getBit(U64 bitboard, boardSquare square){
+
+U64 myUtils::getBit(U64 bitboard, boardSquare square){
     return (bitboard & (1ULL << square));
 }
 
-void Utils::setBit(U64& bitboard, boardSquare square){
+void myUtils::setBit(U64& bitboard, boardSquare square){
     bitboard |= (1ULL << square);
 }
 
-void Utils::removeBit(U64& bitboard,boardSquare square){
+void myUtils::removeBit(U64& bitboard,boardSquare square){
     getBit(bitboard, square) ? bitboard ^= (1ULL << square): 0;
 }
 
 // counts number of bits in given ULL
-int Utils::countBits(U64 bitboard){
+int myUtils::countBits(U64 bitboard){
     int count = 0;
     while(bitboard){
         count++;
@@ -44,7 +45,7 @@ int Utils::countBits(U64 bitboard){
 }
 
 // counts number of bits before least significant bit in given ULL
-int Utils::firstLeastSignificantBitIndex(U64 bitboard){
+int myUtils::firstLeastSignificantBitIndex(U64 bitboard){
     // ensure that paramater is NOT 0
     if(bitboard){
         return countBits((bitboard & -bitboard) - 1);
@@ -54,7 +55,7 @@ int Utils::firstLeastSignificantBitIndex(U64 bitboard){
 }
 // generates a specific occupancy bitboard from given num based on this 
 // specific attackMask
-U64 Utils::setOccupancy(int num, int bitsInMask, U64 attackMask){
+U64 myUtils::setOccupancy(int num, int bitsInMask, U64 attackMask){
      U64 occupancy = 0ULL;
      for(int i = 0; i < bitsInMask; i++){
         int square = firstLeastSignificantBitIndex(attackMask);

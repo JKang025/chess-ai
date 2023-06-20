@@ -2,6 +2,11 @@
 #define RANDOM_H
 
 #include "libconstants.h"
+#include "utils.h"
+
+
+using namespace myConstants;
+using namespace myUtils;
 
 class Random{
     
@@ -10,10 +15,8 @@ class Random{
         unsigned int state = 1804289383;
 
         unsigned int getRandomU32Num();
-
-        libConst::U64 getRandomU64Nums();
-
-        libConst::U64 generatemagicNumCand();
+        U64 getRandomU64Nums();
+        U64 generatemagicNumCand();
 
 
 };
