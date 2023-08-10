@@ -513,6 +513,17 @@ U64 Board::generateRealRookAttacks(boardSquare square, U64 block){
     return attacks;
 }
 
+void Board::initializeAll(){
+    initializeLeaperPieces();
+    // initializeMagicNumber(); NOT NESSESARY, ALREADY PRE GENERATED
+    
+
+}
+
+// MAGIC NUM
+// ===================
+// ===================
+
 U64 Board::findMagicNumber(boardSquare square, int relevant_bits, int isBishop)
 {
     // init occupancies

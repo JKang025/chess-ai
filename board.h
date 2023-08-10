@@ -32,6 +32,16 @@ class Board{
 
         void initializeLeaperPieces();
 
+        U64 bishopMasks[64];
+        U64 rookMasks[64];
+
+        // [square][occupancy]
+        U64 bishopAttacks[64][512];
+
+        // [square][occpuancy]
+        U64 rookAttacks[64][4096];
+
+
         U64 generateBishopAttacks(boardSquare square);
         //U64 bishopAttacks[64];
         U64 generateRealBishopAttacks(boardSquare square, U64 block);
@@ -43,6 +53,8 @@ class Board{
 
         U64 findMagicNumber(boardSquare square, int relevantBits, int bishop);
         void initializeMagicNumber();
+
+        void initializeAll();
     
     private:
         struct Move{

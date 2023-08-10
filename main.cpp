@@ -12,7 +12,7 @@ int main(int argc, char const *argv[]){
    Board bruh = Board();
    Random rand = Random();
    
-    bruh.initializeLeaperPieces();
+    bruh.initializeAll();
 
     
     
