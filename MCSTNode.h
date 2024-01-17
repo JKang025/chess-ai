@@ -2,6 +2,7 @@
 #define MCSTNODE_H
 
 #include <unordered_set>
+#include <vector>
 #include "chess.h"
 
 
@@ -14,8 +15,9 @@ class MCSTNode{
         chess::Board _board;
         MCSTNode* _parent;
         int _numberOfVisits;
+        int _parentsNumberOfVisits;
         double _exploitFactor; // Upper Confidence Bound
-        std::unordered_set<MCSTNode*> _children;
+        std::vector<MCSTNode*> _children;
 
     private:
         
@@ -25,11 +27,11 @@ class MCSTNode{
 
 double UCB(MCSTNode* node);
 MCSTNode* select(MCSTNode* node);
-MCSTNode* expand(MCSTNode* node);
-std::pair<MCSTNode*, int> rollout(MCSTNode* node); //node - result
+MCSTNode* expand(MCSTNode* node, chess::Color color);
+std::pair<MCSTNode*, double> rollout(MCSTNode* node, chess::Color color); //node - result
 MCSTNode* rollback(MCSTNode* node, double reward);
 
-uint16_t calculateMove(MCSTNode* node, bool isOver, int white, int iterations);
+chess::Move calculateMove(MCSTNode* node, bool isOver, chess::Color color, int iterations);
 
 
 

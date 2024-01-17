@@ -2,3 +2,4 @@ Main
 .vscode
 *.o
 CMakeFiles
+CMakeCache.txt
