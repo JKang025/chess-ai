@@ -28,7 +28,7 @@ class MCSTNode{
 double UCB(MCSTNode* node);
 MCSTNode* select(MCSTNode* node);
 MCSTNode* expand(MCSTNode* node, chess::Color color);
-std::pair<MCSTNode*, double> rollout(MCSTNode* node, chess::Color color); //node - result
+std::pair<MCSTNode*, double> rollout(MCSTNode* node); //node - result
 MCSTNode* rollback(MCSTNode* node, double reward);
 
 chess::Move calculateMove(MCSTNode* node, bool isOver, chess::Color color, int iterations);

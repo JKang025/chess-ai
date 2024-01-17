@@ -20,11 +20,11 @@ double UCB(MCSTNode* node){
 
 
 
-std::pair<MCSTNode*, double> rollout(MCSTNode* node, chess::Color color){
+std::pair<MCSTNode*, double> rollout(MCSTNode* node){
     if(node->_board.outcome() != std::nullopt){
         if(node->_board.outcome()->winner == std::nullopt){
             return std::make_pair(node, 0);
-        }else if(node->_board.outcome()->winner == color){
+        }else if(node->_board.outcome()->winner == chess::WHITE){
             return std::make_pair(node, 1);
         }else{
             return std::make_pair(node, -1);
@@ -44,7 +44,7 @@ std::pair<MCSTNode*, double> rollout(MCSTNode* node, chess::Color color){
     srand(static_cast<unsigned int>(time(NULL)));
     int randomIndex = rand() % node->_children.size();
     MCSTNode* randomChild = node->_children[randomIndex];
-    return rollout(randomChild, color);
+    return rollout(randomChild);
 
 }
 
