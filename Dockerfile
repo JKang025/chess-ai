@@ -12,3 +12,4 @@ RUN apk add py3-pip
 RUN apk add g++
 RUN apk add make
 RUN apk add gdb
+RUN apk add cmake

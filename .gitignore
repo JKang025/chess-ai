@@ -1,2 +1,4 @@
-all
+Main
 .vscode
+*.o
+CMakeFiles
