@@ -11,7 +11,7 @@ class MCSTNode{
         MCSTNode();
         //MCSTNode(chess::Board board, MCSTNode* parent, chess::Move previousMove);
 
-        MCSTNode(MCSTNode* parent, std::string fen);
+        MCSTNode(MCSTNode* parent, std::string fen, chess::Color);
 
         //chess::Board _board;
         MCSTNode* _parent;
@@ -22,7 +22,7 @@ class MCSTNode{
         //chess::Move _previousMove;
 
         std::string _fen; 
-        //chess::Color _turn;
+        chess::Color _turn;
 
     private:
         
@@ -31,9 +31,9 @@ class MCSTNode{
 };
 
 double UCB(MCSTNode* node);
-MCSTNode* select(MCSTNode* node);
-MCSTNode* expand(MCSTNode* node, chess::Color color);
-std::pair<MCSTNode*, double> rollout(MCSTNode* node, chess::Board& board); //node - result
+MCSTNode* select(MCSTNode* node, chess::Board& board);
+MCSTNode* expand(MCSTNode* node, chess::Board& color);
+std::pair<MCSTNode*, std::optional<chess::Color>> rollout(MCSTNode* node, chess::Board& board); //node - result
 MCSTNode* rollback(MCSTNode* node, double reward);
 
 void treeCleanup(MCSTNode* node);
