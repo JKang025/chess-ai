@@ -7,6 +7,10 @@ int main() {
     MCSTNode* node = new MCSTNode();
 
 
+    std::cout << "hehe" << sizeof(node->_board) << std::endl;
+    std::cout << "hehe" << sizeof(node->_children) << std::endl;
+    std::cout << "hehe" << sizeof(node->_previousMove) << std::endl;
+
     while (!node->_board.is_game_over(true)) {
         while (true) {
             
@@ -14,7 +18,7 @@ int main() {
             std::cout << std::endl;
     
             std::cout << "Engine recomendation: " << std::endl;
-            std::optional<chess::Move> optionalMove = calculateMove(node, node->_board.turn, 10);
+            std::optional<chess::Move> optionalMove = calculateMove(node, node->_board.turn, 100);
             for(auto n : node->_children){
                 std::cout << n->_exploitFactor << "  " << n->_numberOfVisits << std::endl;
             }

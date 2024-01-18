@@ -64,10 +64,10 @@ double UCB(MCSTNode* node){
 std::pair<MCSTNode*, double> rollout(MCSTNode* node){
   
 
-    if(node->_board.outcome() != std::nullopt){
+    if(node->_board.is_game_over(true)){
         if(node->_board.outcome()->winner == std::nullopt){
             //std::cout << "draw" <<std::endl; //FOR DEBUGGING DELETE LATER
-            return std::make_pair(node, 0.5);
+            return std::make_pair(node, 0);
         }else if(node->_board.outcome()->winner == chess::WHITE){
             //std::cout << "white won" <<std::endl;
             return std::make_pair(node, 1);
