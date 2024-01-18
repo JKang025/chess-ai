@@ -12,19 +12,18 @@ MCSTNode::MCSTNode()
     : _parent(nullptr), 
       _numberOfVisits(0), 
       _exploitFactor(0.0),
-      _board(chess::Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")),
       _children(), // initialize as empty vector
-      _previousMove(chess::Move::null())
+      _fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 {
+    //_turn = chess::WHITE;
 }
 
-MCSTNode::MCSTNode(chess::Board board, MCSTNode* parent, chess::Move move)
+MCSTNode::MCSTNode(MCSTNode* parent, std::string fen)
     : _parent(parent), 
       _numberOfVisits(0), 
       _exploitFactor(0.0),
-      _board(board),
       _children() ,
-      _previousMove(move)
+      _fen(fen)
 {
     
 }
@@ -56,19 +55,29 @@ double UCB(MCSTNode* node){
 
     // UCB1 formula
     double EXPLORATION_CONSTANT = 1.414;
-    return node->_exploitFactor + EXPLORATION_CONSTANT * std::sqrt((2 * std::log(parentVisits)) / node->_numberOfVisits);
+    return node->_exploitFactor / node->_numberOfVisits + EXPLORATION_CONSTANT * std::sqrt((std::log(parentVisits)) / node->_numberOfVisits);
 }
 
 
 
-std::pair<MCSTNode*, double> rollout(MCSTNode* node){
-  
+void setupBoard(MCSTNode* node, chess::Board& board){
+    board.set_fen(node->_fen);
+    //board.turn = node->_turn;
+}
 
-    if(node->_board.is_game_over(true)){
-        if(node->_board.outcome()->winner == std::nullopt){
+std::pair<MCSTNode*, double> rollout(MCSTNode* node, chess::Board& board){
+  
+    setupBoard(node, board);
+
+    // std::cout << std::string(board) << std::endl;
+    // std::cout << std::endl;
+
+
+    if(board.is_game_over(true)){
+        if(board.outcome()->winner == std::nullopt){
             //std::cout << "draw" <<std::endl; //FOR DEBUGGING DELETE LATER
             return std::make_pair(node, 0);
-        }else if(node->_board.outcome()->winner == chess::WHITE){
+        }else if(board.outcome()->winner == chess::WHITE){
             //std::cout << "white won" <<std::endl;
             return std::make_pair(node, 1);
         }else{
@@ -77,20 +86,18 @@ std::pair<MCSTNode*, double> rollout(MCSTNode* node){
         }
     }
 
-    chess::LegalMoveGenerator legalMoves = node->_board.legal_moves();
+    chess::LegalMoveGenerator legalMoves = board.legal_moves();
     std::vector<chess::Move> moves = legalMoves;
-
     for(auto move : moves){
-        chess::Board temp = chess::Board(node->_board.copy());
-        temp.push(move);
-        MCSTNode* child = new MCSTNode(temp, node, move);
+        board.push(move);
+        MCSTNode* child = new MCSTNode(node, board.fen());
+        board.pop();
         node->_children.push_back(child);
     }
-
     srand(static_cast<unsigned int>(time(NULL)));
     int randomIndex = rand() % node->_children.size();
     MCSTNode* randomChild = node->_children[randomIndex];
-    return rollout(randomChild);
+    return rollout(randomChild, board);
 
 }
 
@@ -135,22 +142,24 @@ MCSTNode* rollback(MCSTNode* node, double reward){
     return node;
 }
 
-std::optional<chess::Move> calculateMove(MCSTNode* node, chess::Color white, int iterations){
+std::optional<chess::Move> calculateMove(MCSTNode* node, chess::Board board, chess::Color white, int iterations){
 
+    setupBoard(node, board);
     // should never reach here
-    if(node->_board.outcome() != std::nullopt){
+    if(board.outcome(true) != std::nullopt){
         return std::nullopt;
     }
 
     std::unordered_map<MCSTNode*, chess::Move> nodeToMove;
 
-    chess::LegalMoveGenerator legalMoves = node->_board.legal_moves();
+    chess::LegalMoveGenerator legalMoves = board.legal_moves();
     std::vector<chess::Move> moves = legalMoves;
 
     for(chess::Move move : moves){
-        chess::Board temp = chess::Board(node->_board.board_fen());
-        temp.push(move);
-        MCSTNode* child = new MCSTNode(temp, node, move);
+        
+        board.push(move);
+        MCSTNode* child = new MCSTNode(node, board.fen()); //chhange
+        board.pop();
         node->_children.push_back(child);
 
         if (nodeToMove.find(child) == nodeToMove.end()) {
@@ -172,9 +181,11 @@ std::optional<chess::Move> calculateMove(MCSTNode* node, chess::Color white, int
             }
 
             
-            std::cout << "iteration: " << iterations << std::endl;
+            //std::cout << "iteration: " << iterations << std::endl;
             
-
+            if(iterations % 500 == 0){
+                std::cout << "iteration: " << iterations << std::endl;
+            }
             
 
             MCSTNode* expandChild = expand(selectChild, chess::WHITE);
@@ -183,7 +194,7 @@ std::optional<chess::Move> calculateMove(MCSTNode* node, chess::Color white, int
 
         
 
-            std::pair<MCSTNode*, double> rolloutChild = rollout(expandChild);
+            std::pair<MCSTNode*, double> rolloutChild = rollout(expandChild, board);
 
 
             rollback(rolloutChild.first, rolloutChild.second);
@@ -199,7 +210,7 @@ std::optional<chess::Move> calculateMove(MCSTNode* node, chess::Color white, int
             }
 
             MCSTNode* expandChild = expand(selectChild, chess::BLACK);
-            std::pair<MCSTNode*, double> rolloutChild = rollout(expandChild);
+            std::pair<MCSTNode*, double> rolloutChild = rollout(expandChild, board);
             rollback(rolloutChild.first, rolloutChild.second);
             iterations -= 1;
         }

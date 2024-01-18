@@ -4,46 +4,42 @@
 
 int main() {
     
-    MCSTNode* node = new MCSTNode();
+    MCSTNode* node = new MCSTNode(nullptr, "8/8/5p2/1P1K1k2/8/2r5/8/7R w - - 0 0");
+    chess::Board board;
+    setupBoard(node, board);
 
-
-    std::cout << "hehe" << sizeof(node->_board) << std::endl;
-    std::cout << "hehe" << sizeof(node->_children) << std::endl;
-    std::cout << "hehe" << sizeof(node->_previousMove) << std::endl;
-
-    while (!node->_board.is_game_over(true)) {
+    
+    while (!board.is_game_over(true)) {
         while (true) {
             
-            std::cout << node->_board.unicode(false, true) << std::endl;
+            std::cout << board.unicode(false, true) << std::endl;
             std::cout << std::endl;
     
             std::cout << "Engine recomendation: " << std::endl;
-            std::optional<chess::Move> optionalMove = calculateMove(node, node->_board.turn, 100);
+            std::optional<chess::Move> optionalMove = calculateMove(node, board, board.turn, 3000);
             for(auto n : node->_children){
                 std::cout << n->_exploitFactor << "  " << n->_numberOfVisits << std::endl;
             }
             if(optionalMove.has_value()){
-                std::cout << node->_board.san(*optionalMove) << std::endl;
+                std::cout << board.san(*optionalMove) << std::endl;
             }
             std::cout << std::endl;
 
             std::string san;
-            std::cout << node->_board.ply() + 1 << ". " << (node->_board.turn ? "[WHITE] " : "[BLACK] ") << "Enter Move: ";
+            std::cout << board.ply() + 1 << ". " << (board.turn ? "[WHITE] " : "[BLACK] ") << "Enter Move: ";
             std::cin >> san;
             std::cout << std::endl;
             
             
 
             try {
-                chess::Move move = node->_board.parse_san(san);
+                chess::Move move = board.parse_san(san);
                 if (!move) {
                     throw std::invalid_argument("");
                 }
-                node->_board.push(move);
-                
-                chess::Board tempBoard = node->_board;
+                board.push(move);
                 treeCleanup(node);
-                node = new MCSTNode(tempBoard, nullptr, move);
+                node = new MCSTNode(nullptr, board.fen());
                 break;
             } catch (std::invalid_argument) {
                 std::cout << "Invalid Move, Try Again..." << std::endl;
@@ -53,6 +49,6 @@ int main() {
 
     treeCleanup(node); // cleans up all nodes
 
-    std::cout << "Game Over! Result: " << node->_board.result(true);
+    std::cout << "Game Over! Result: " << board.result(true);
     std::cout << std::endl;
 }

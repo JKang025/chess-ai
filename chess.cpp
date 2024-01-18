@@ -1512,14 +1512,22 @@ namespace chess
         {
             if (fen[i] == '/')
             {
-                rows.push_back(fen.substr(i++ - dist, dist));
-                dist = 0;
+                rows.push_back(fen.substr(i - dist, dist));
+                dist = -1;
             }
             else if (i == fen.length() - 1)
             {
-                rows.push_back(fen.substr(i - dist));
+                rows.push_back(fen.substr(i - dist, dist + 1));
             }
         }
+        
+
+        // std::cout <<fen << std::endl;
+        // for(auto s : rows){
+        //     std::cout << s << std::endl;
+        // }
+
+
         if (rows.size() != 8)
         {
             throw std::invalid_argument("expected 8 rows in position part of fen: \"" + fen + "\"");
@@ -3125,6 +3133,7 @@ namespace chess
         }
 
         // Validate the board part and set it.
+        //std::cout << board_part <<std::endl;
         this->_set_board_fen(board_part);
 
         // Apply.
