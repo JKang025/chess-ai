@@ -10,7 +10,7 @@
 #include <set>
 
 double EPSILON = 0.1; // for the select function determines how random it is
-double EXPLORATION_CONSTANT = 4; // for the UCB1 function, determines the exploration exploitation balance
+double EXPLORATION_CONSTANT = 5; // for the UCB1 function, determines the exploration exploitation balance
 
 MCSTNode::MCSTNode()
     : _parent(nullptr), 
@@ -30,7 +30,6 @@ MCSTNode::MCSTNode(MCSTNode* parent, std::string fen, chess::Color color)
       _fen(fen),
       _turn(color)
 {
-    
 }
 
 
@@ -42,7 +41,6 @@ double UCB(MCSTNode* node){
     }
         
     // If the node is the root, it may not have a parent, handle division by zero
-    //int parentVisits = (node->_parent != nullptr) ? node->_parent->_numberOfVisits : 1;
     int parentVisits;
     if(node->_parent != nullptr){
         if(node->_parent->_numberOfVisits == 0){
@@ -54,11 +52,9 @@ double UCB(MCSTNode* node){
         parentVisits = 1;
     }
 
-    
-    
-
     // UCB1 formula
-    return node->_exploitFactor / node->_numberOfVisits + EXPLORATION_CONSTANT * std::sqrt((std::log(parentVisits)) / node->_numberOfVisits);
+    return node->_exploitFactor / node->_numberOfVisits 
+           + EXPLORATION_CONSTANT * std::sqrt((std::log(parentVisits)) / node->_numberOfVisits);
 }
 
 MCSTNode* select(MCSTNode* node, chess::Board& board){
@@ -74,10 +70,8 @@ MCSTNode* select(MCSTNode* node, chess::Board& board){
     }
      
     // continue to select
-
     double maxUCB = std::numeric_limits<double>::lowest();;
     MCSTNode* child = nullptr;
-
      
     double randValue = static_cast<double>(rand()) / RAND_MAX; // Random value between 0 and 1
     if (randValue < EPSILON) {
@@ -100,7 +94,6 @@ MCSTNode* select(MCSTNode* node, chess::Board& board){
 }
 
 MCSTNode* expand(MCSTNode* node, chess::Board& board){
-    
 
     setupBoard(node, board);
     chess::LegalMoveGenerator legalMoves = board.legal_moves();
@@ -110,7 +103,6 @@ MCSTNode* expand(MCSTNode* node, chess::Board& board){
         board.push(move);
         std::string moveFen = board.fen();
         board.pop();
-
         bool found = false;
         for(auto child : node->_children){
             if(child->_fen == moveFen){
@@ -124,8 +116,7 @@ MCSTNode* expand(MCSTNode* node, chess::Board& board){
     }
 
     // should never reach
-    return nullptr; 
-    
+    return nullptr;    
 }
 
 
@@ -149,8 +140,6 @@ std::pair<MCSTNode*, std::optional<chess::Color>> rollout(MCSTNode* node, chess:
         // }
         //std::cout << board.outcome()->result() << std::endl;
 
-       
-       
         return std::make_pair(node, board.outcome()->winner);
         
     }
@@ -165,8 +154,6 @@ std::pair<MCSTNode*, std::optional<chess::Color>> rollout(MCSTNode* node, chess:
     MCSTNode* child = new MCSTNode(node, board.fen(), !node->_turn);
     board.pop();
     node->_children.push_back(child);
-
-
     return rollout(child, board);
 
 }
@@ -232,14 +219,20 @@ std::optional<chess::Move> calculateMove(MCSTNode* node, chess::Board board, che
             }
 
             MCSTNode* selectChild = select(node, board);
-
-
             MCSTNode* expandChild = expand(selectChild, board);
             std::pair<MCSTNode*, std::optional<chess::Color>> rolloutChild = rollout(expandChild, board);
+            
+            // if(rolloutChild.second != std::nullopt){
+            //     if(rolloutChild.second == chess::WHITE){
+            //         std::cout << "1 white" << std::endl;
+            //     }
+            //     if(rolloutChild.second == chess::BLACK){
+            //         std::cout << "1 black" << std::endl;
+            //     }
+            // }
             rollback(rolloutChild.first, rolloutChild.second);
 
             iterations -= 1;
-        
     }
 
     // select best node after tree is constructed
@@ -287,5 +280,4 @@ void deleteTree(MCSTNode* root){
 
 void setupBoard(MCSTNode* node, chess::Board& board){
     board.set_fen(node->_fen);
-    //board.turn = node->_turn;
 }
